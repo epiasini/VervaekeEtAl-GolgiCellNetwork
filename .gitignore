@@ -6,6 +6,8 @@ generatedGENESIS
 generatedNeuroML
 generatedMOOSE
 generatedPSICS
+generatedFigures
 simulations
 *.bak
 *py.class
+neuroConstruct/dataSets/graphs
