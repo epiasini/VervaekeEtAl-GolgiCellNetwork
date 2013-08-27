@@ -11,3 +11,5 @@ simulations
 *.bak
 *py.class
 neuroConstruct/dataSets/graphs
+/neuroConstruct/pythonScripts/cell_positions.csv
+/neuroConstruct/pythonScripts/edge_lists.csv
