@@ -54,13 +54,17 @@ if __name__ == "__main__":
         for k,e in enumerate(edge_list):
             if e[0] > e[1]:
                 edge_list[k] = [e[1], e[0]]
-    ordered_edge_lists = ((tuple(l2) for l2 in l1) for l1 in ordered_edge_lists)
+    ordered_edge_lists = [[tuple(l2) for l2 in l1] for l1 in ordered_edge_lists]
     # for each trial, filter the ordered edge list and keep only its
     # unique elements. The result is a list of lists of all connected
     # cell pairs, regardless of the number of gap junctions between
     # them
     cell_pair_lol = [np.array(list(set(l))) for l in ordered_edge_lists]
-    graphs = [nx.empty_graph(n_cells) for each in cell_pair_lol]
+    # but for the 2010 connection algorithm there shouldn't be any
+    # multiedge in the graph
+    for k, cell_pair_list in enumerate(cell_pair_lol):
+        assert len(cell_pair_list)==len(ordered_edge_lists[k])
+    graphs = [nx.empty_graph(n_cells, create_using=nx.Graph()) for each in cell_pair_lol]
     for k,g in enumerate(graphs):
         g.add_edges_from(cell_pair_lol[k])
         nx.write_graphml(g, '../dataSets/graphs/graph_2010_ncells{0}_trial{1:02}.graphml'.format(n_cells, k))
@@ -71,7 +75,10 @@ if __name__ == "__main__":
     average_shortest_path_lengths = np.array([nx.average_shortest_path_length(g) for g in graphs])
     print("Average shortest path length: {0} ± {1}".format(average_shortest_path_lengths.mean(),
                                                            np.sqrt(average_shortest_path_lengths.var())))
-
+    laplacian_spectra = [np.sort(nx.laplacian_spectrum(g)) for g in graphs]
+    eigenratios = np.array([s[-1]/(s[2]) for s in laplacian_spectra])
+    print("Average eigenratio: {0} ± {1}".format(eigenratios.mean(),
+                                                 np.sqrt(eigenratios.var())))
     # for each trial, calculate the degree sequence of the
     # network. Note that the degree of a cell is defined as the number
     # of unique cells it's connected to; the number of gap junctions
